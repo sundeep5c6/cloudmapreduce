@@ -1,5 +1,3 @@
-#prebuilt AMI image to facilitate running Cloud MapReduce job
-
 = AMI image =
 
 To make running a Cloud !MapReduce job easier, we have built a AMI image which hides a lot of details. To launch a job, specify how many EC2 instances you need, and specify parameters (described below) as user data, then you are in business.
