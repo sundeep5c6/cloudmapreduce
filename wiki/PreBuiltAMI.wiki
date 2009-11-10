@@ -1,0 +1,46 @@
+#prebuilt AMI image to facilitate running Cloud MapReduce job
+
+= AMI image =
+
+To make running a Cloud !MapReduce job easier, we have built a AMI image which hides a lot of details. To launch a job, specify how many EC2 instances you need, and specify parameters (described below) as user data, then you are in business.
+
+AMI ID: ami-be5fbcd7, 32bits, x86, US (have not tried EU, probably does not work)
+
+The AMI ID may change over time as we rebundle the image to fix problems, but the manifest will stay the same. You will always find the latest in S3 as huanliu/!CloudMapReduce.manifest.xml.
+
+
+= How to use the AMI =
+
+The AMI takes configuration data as user data in the following form.
+
+{{{
+AWS_ACCESS_KEY=xxxxxxxxxx
+AWS_SECRET_KEY=ssssssssssssssssssss
+CLOUDMAPREDUCE_JAR=/cloudos/cloudmapreduce.jar
+COMMAND_LINE="com.acnlabs.CloudMapReduce.application.WordCount -k xxxxxxxxxx -s ssssssssssssssssssss -i /cloudos/test25.txt -j jobid -p 20 -r 20 -cb -c CLIENT_ID"
+JOB_ID=test100
+OUTPUT=/cloudos/results
+OTHER_CONFIG=/cloudos/config
+OTHER_SCRIPT=/cloudos/script
+BASE_ID=0
+}}}
+
+The user data is dumped to a file, and source'd as a bash shell file. In essence, it defines a set of shell variables. The meaning of each is as follows.
+
+ * AWS_ACCESS_KEY:  This is your AWS access key. You get this key when you sign up for AWS services.
+
+ * AWS_SECRET_KEY:  This is your AWS secret key. The access/secret key pair is used to download JAR file, upload log file, so make sure they are valid for the buckets specified. 
+
+ * CLOUDMAPREDUCE_JAR: This is the JAR file which contains both Cloud !MapReduce and your application. You can either do "Ant" in the source tree to compile it into a JAR, or use "Export->JAR file" in Eclipse. The first part of the path should be the S3 bucket name. In the example, "cloudos" is the bucket name.
+
+ * COMMAND_LINE: This is the command line to run on each instance. See the [CmdLineRef Command Line Reference] for details. Note that you will need to provide an AWS access/secret key pair on the command line, and it is used to access SQS/S3/SimpleDB services as part of the Cloud !MapReduce job. Also, "CLIENT_ID" is a special variable, which will be translated to a numeral number that will be supplied as the "clientid" option on the command line. Each node needs to have a unique "clientid". 
+
+  * JOB_ID: A name used to create a subfolder to store the resulting log file.
+
+  * OUTPUT: The top level directory to store log files. The first path (e.g., "cloudos" in the example) should be a bucket name. The log files are stored under /OUTPUT/JOB_ID/reservation_id/launch_id.
+
+  * OTHER_CONFIG: The configuration data in user data is fixed once an instance is launched. To facilitate multiple job runs per launch, you can optionally specify an additional configuration file in S3. The script reads the configuration data in the user data first, then download the OTHER_CONFIG data. In other words, configuration data in OTHER_CONFIG overwrites what is in the user data. You can specify a different job parameter, and reboot the instances to start processing. Rebooting is more cost effective since AWS rounds up your usage to an hour.
+
+  * OTHER_SCRIPT: The AMI has a built-in script to launch jobs. But, you can optionally include an additional script to change its behavior. OTHER_SCRIPT is a bash script, and it is called right before invoking the Cloud !MapReduce command line. 
+
+  * BASE_ID: Each node needs to have a unique clientid. If you specify "-c CLIENT_ID" on the command line parameter, the clientid is determined by summing BASE_ID with the launch ID. BASE_ID by default is 0. When you first launch a set of nodes, each will have a unique launch ID. For example, if you launch 100 instances, they are numbered 0 to 99. But if you launch additional instances later to help with the processing, you need to set the BASE_ID to be more than 100 for the new set of nodes, so that the new nodes would have a unique clientid. BASE_ID should not be set in OTHER_SCRIPT if you launched two batches of instances, since each batch will use the same BASE_ID, and it will result in duplicate clientid.
