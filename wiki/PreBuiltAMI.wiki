@@ -43,3 +43,7 @@ The user data is dumped to a file, and source'd as a bash shell file. In essence
   * OTHER_SCRIPT: The AMI has a built-in script to launch jobs. But, you can optionally include an additional script to change its behavior. OTHER_SCRIPT is a bash script, and it is called right before invoking the Cloud !MapReduce command line. 
 
   * BASE_ID: Each node needs to have a unique clientid. If you specify "-c CLIENT_ID" on the command line parameter, the clientid is determined by summing BASE_ID with the launch ID. BASE_ID by default is 0. When you first launch a set of nodes, each will have a unique launch ID. For example, if you launch 100 instances, they are numbered 0 to 99. But if you launch additional instances later to help with the processing, you need to set the BASE_ID to be more than 100 for the new set of nodes, so that the new nodes would have a unique clientid. BASE_ID should not be set in OTHER_SCRIPT if you launched two batches of instances, since each batch will use the same BASE_ID, and it will result in duplicate clientid.
+
+= login =
+
+To login to an instance of this AMI, you can ssh into the "cloudmapreduce" account using your key-pair. Instead of waiting for the job finish to see the log, you can watch the log file as the job progresses. Go to ~/cloudmapreduce/ directory, then type "tail -f output". 
