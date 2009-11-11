@@ -53,6 +53,7 @@
   <target name="compile" depends="clean">
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${build.classes}"/>
+  	<copy file="${src.dir}/log4j.properties" todir="${build.classes}"></copy>
     <javac 
       encoding="${build.encoding}"
       srcdir="${src.dir}"
@@ -69,7 +70,6 @@
     <jar jarfile="${jar.file}"
          basedir="${build.classes}">
     </jar>
-  	<copy file="${src.dir}/log4j.properties" todir="${build.classes}"></copy>
   </target>
   
   <target name="clean">
