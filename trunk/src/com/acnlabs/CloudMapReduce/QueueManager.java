@@ -19,6 +19,8 @@ package com.acnlabs.CloudMapReduce;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -392,6 +394,13 @@ public class QueueManager implements Closeable {
 		}
     	
     	public void push(String value) {
+    		// SQS does not support all characters, has to encode to get around
+    		try {
+    			value = URLEncoder.encode(value, "UTF-8");
+    		}
+    		catch (Exception ex) {
+        		logger.error("Message encoding failed. " + ex.getMessage());
+    		}
     		if (value.length() >= MAX_MESSAGE_BODY_SIZE) {
         		super.push(value);
     			return;
@@ -437,6 +446,13 @@ public class QueueManager implements Closeable {
     		Message msg = new Message();
     		getNext();
     		String next = list[pos];
+    		// decode message as it was encoded when pushed to SQS
+    		try {
+    			next = URLDecoder.decode(next, "UTF-8");
+    		}
+    		catch (Exception ex) {
+        		logger.error("Message decoding failed. " + ex.getMessage());
+    		}
     		pos++;
     		msg.setBody(next);
     		return msg;
