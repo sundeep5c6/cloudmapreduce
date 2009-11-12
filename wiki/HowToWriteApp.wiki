@@ -1,3 +1,4 @@
+#labels Featured
 This page gives a tutorial on how to write an application in Cloud !MapReduce. We use the famous Word Count application as an example. The complete source code is in the repository.
 
 = Base class =
@@ -25,9 +26,9 @@ As part of the `Mapper` interface, we must implement the `map` function, which t
                     OutputCollector output, PerformanceTracker perf) throws Exception {
 }}}
 
-As described in the original !MapReduce paper, the `key` and `value` are both String. The application should convert from the generic String type to the appropriate strong-typed data type. It is in the plan for Cloud !MapReduce to eventually support other data types, even customer specified, as both the key and value. 
+As described in the original !MapReduce paper, the `key` and `value` are both String. The application should convert from the generic String type to the appropriate strong-typed data type. It is in the plan for Cloud !MapReduce to eventually support other data types, even custom specified, as both the key and value. 
 
-`output` is a `OutputCollector`, which collects the resulting key-value pairs emitted by the Map function and passes them to the reduce stage. Lastly, `perf` is a `PerformanceTracker`, which is a home-grown solution for tracking performance statistics. It can track elapsed time statistics as follows:
+`output` is an `OutputCollector`, which collects the resulting key-value pairs emitted by the Map function and passes them to the reduce stage. Lastly, `perf` is a `PerformanceTracker`, which is a home-grown solution for tracking performance statistics. It can track elapsed time statistics as follows:
 
 {{{
 long startTime = perf.getStartTime();
@@ -112,7 +113,7 @@ The `run` function should initialize the `MapReduce` class, and initialize a new
     Reduce reduce = new Reduce();
 }}}
 
-Then, `run` should invoke the MapReduce function to start the job processing.
+Then, `run` should invoke the !MapReduce function to start the job processing.
 
 {{{
     // invoke Map Reduce with input SQS name and output SQS name
@@ -133,4 +134,4 @@ Lastly, since the application class is invoked directly, it needs to pass contro
 
 If this section seems complicated, you just need to copy and paste for now. We are looking into ways to make this as painless as possible in the near future.
 
-Congratulations on writing your first Cloud MapReduce application!
+Congratulations on writing your first Cloud !MapReduce application!
