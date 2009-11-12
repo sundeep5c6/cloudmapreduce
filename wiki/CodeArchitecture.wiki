@@ -79,5 +79,40 @@ public int getReduceQSize()
 
 Again, the `Runnable` is used to spawn multiple domains to increase the write throughput. 
  
-= Queue interface ==
+== Queue interface ==
 
+Similar to the database interface, the queue interface is intended to be portable, so that we can run on a different infrastructure than Amazon in the future. Even though today the pure queue processing and the SQS interface parts are mixed in the same file, it is relatively easy to separate out the two functions in the future to support a different queue implementation, such as [http://activemq.apache.org/ ActiveMQ].
+
+`com.acnlabs.CloudMapReduce.QueueManager` contains two queue implementations, both conform to the interface defined by `com.acnlabs.CloudMapReduce.SimpleQueue` and `com.acnlabs.CloudMapReduce.SimpleQueueAdapter`. 
+
+One queue implementation is called `SimpleQueueImpl`. It implements the standard Push and Pop interfaces and it interfaces with SQS directly. It contains a variable `maxNumMessages` (configurable by user) which indicates how many SQS messages it attempts to keep in its buffer for reading. If the number of messages falls below the threshold, it spawns many `PopRunnable` objects to download from SQS in parallel. For writing to SQS, it always spawns `PushRunnable` to upload the message to SQS in the background. `SimpleQueueImpl` tags messages before sending them in order to identify which node and which map task generated the messages, and it filters messages when receiving them in order to remove duplicate and redundant messages. 
+
+The other queue implementation is called `EfficientQueue`, which is built on top of `SimpleQueueImpl`. It aggregates small messages into a big one before sending it to the underlying `SimpleQueueImpl`. Similarly, it de-multiplex small messages from a big one when reading from `SimpleQueueImpl`. 
+
+`QueueManager` also contains several useful functions for creating SQS queues, listing SQS queues so that it knows what additional queue needs to be created, and deleting SQS queues for clean up. 
+
+== File system interface == 
+
+Cloud !MapReduce uses S3 as the file system. Like the database and queue interface, the file system interface could be replaced in the future to support other file systems, such as that provided by [http://project-voldemort.com/ Project Voldemort]. 
+
+The file system interface is captured in two classes: `com.acnlabs.CloudMapReduce.S3FileSystem` and `com.acnlabs.CloudMapReduce.S3Item`. They are very short, so we do not elaborate further here. 
+
+= Cloud !MapReduce applications =
+
+There are three sample applications in the `com.acnlabs.CloudMapReduce.application` package: `Grep`, `ReverseIndex`, and `WordCount`. See [HowToWriteApp the how to write apps tutorial] for more understanding of the application code. 
+
+Currently, all application code inherits from `MapReduceApp` class. It handles the common tasks such as command line parsing, setting up the environment to launch the job, creating and populating the input queues. 
+
+Some more rethinking in this area is needed in terms of what needs to be extracted out for all applications, code refactoring, and how to support cascaded !MapReduce jobs. 
+
+= !MapReduce interfaces =
+
+There are several interfaces defined to ensure a consistent implementation. The `Mapper` and `Reducer` interfaces define how the user-defined map and reduce functions should be written. All Cloud !MapReduce jobs must support these interfaces.
+
+In addition, `OutputCollector` defines the standard interface for an application to output the key/value pairs. The `MapCollector`, `CombineCollector` and `ReduceCollector` (defined in `com.acnlabs.CloudMapReduce.mapreduce.MapReduce`) all implements the same interface.
+
+= Supporting classes =
+
+== Thread pool ==
+
+== Performance tracker ==
