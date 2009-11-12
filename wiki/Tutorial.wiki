@@ -79,4 +79,8 @@ At the end of the job, you can look in the S3 bucket to see the log file and see
 
 When the job finishes, all results are stored in the output queue. By default, it is `jobid_outputqueue`. There are scripts in the AMI to help query the queue. For example, `~/deq.py` can dequeue messages from any queue. 
 
+The AMI automatically updates machine statistics, including CPU, network, disk, and memory usage, to Google App Engine (GAE) (See [PreBuiltAMI Pre-built AMI] for more details]. You can monitor these statistics visually at http://ec2-performance.appspot.com. Input the DNS name of your EC2 instance, e.g., ec2-174-129-44-38.compute-1.amazonaws.com, then click `graph`. You will see something similar to the following:
+
+http://s3.amazonaws.com/huanliu/GAEmonitoring.JPG
+
 Congratulations on your first Cloud !MapReduce job. 
