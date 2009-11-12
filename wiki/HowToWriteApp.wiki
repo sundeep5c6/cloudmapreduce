@@ -51,7 +51,7 @@ The Map function would parse the `value` for the list of files to process. For e
 {{{ 
 output.collect(word, "1");
 }}}
-		    		}
+
 = Reducer =	
 
 Next we need to implement the user-defined Reduce function as a `Reducer` class. All Reduce functions must implement the `Reducer` interface.
