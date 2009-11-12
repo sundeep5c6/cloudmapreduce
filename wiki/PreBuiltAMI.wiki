@@ -47,3 +47,11 @@ The user data is dumped to a file, and source'd as a bash shell file. In essence
 = login =
 
 To login to an instance of this AMI, you can ssh into the "cloudmapreduce" account using your key-pair. Instead of waiting for the job finish to see the log, you can watch the log file as the job progresses. Go to ~/cloudmapreduce/ directory, then type "tail -f output". 
+
+= Visual monitoring =
+
+The AMI automatically updates machine statistics, including CPU, network, disk, and memory usage, to Google App Engine (GAE). You can monitor these statistics visually at http://ec2-performance.appspot.com. Input the DNS name of your EC2 instance, e.g., ec2-174-129-44-38.compute-1.amazonaws.com, then click `graph`. You will see something similar to the following
+
+http://s3.amazonaws.com/huanliu/GAEmonitoring.JPG
+
+Since GAE is a free service, there is a limit on the amount of data it can hold. If your data is not displaying, you may need to click `delete` to clear the data store. Either input a DNS name, which will only clear data related to that instance, or leave the name empty, which will clear the whole data store. Obviously, multiple users could step on each other's toes, but this is only for testing usage. For production use, we can help to put in a scalable solution. 
