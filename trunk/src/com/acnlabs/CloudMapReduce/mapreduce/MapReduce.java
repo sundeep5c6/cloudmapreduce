@@ -440,7 +440,8 @@ public class MapReduce {
 					for (Message msg : value) {
 						String keyVal = msg.getBody();
 						count ++ ;
-						int sep = keyVal.indexOf('+');
+						// TODO need a more robust separator mechanism, below is a temporary solution
+						int sep = keyVal.lastIndexOf('+');
 						String key = keyVal.substring(0, sep);
 						String val = keyVal.substring(sep + 1);
 						if (!reduceStates.containsKey(key)) {
