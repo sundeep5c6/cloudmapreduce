@@ -1,0 +1,4 @@
+
+= Introduction =
+
+Even though a reasonable defaults set of parameters are chosen, their choices are unlikely to benefit every application. Depending on the data set, the environment, further performance tuning may be necessary. This page gives tips on how to optimize the parameters. 
