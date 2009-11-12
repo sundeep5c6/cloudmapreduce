@@ -1,3 +1,83 @@
 This page gives a high level view of the source code structure. It is designed to get a new contributor started quickly. However, keep in mind that, there is no substitute to reading the definitive guide -- the source code. 
 
-= Introduction =
+= Database interface =
+
+Cloud !MapReduce uses a central "database" to store the job status. The intent is to have several interfaces, one for each "database" that we support, so that the users can choose the best based on the environment. We currently only support SimpleDB, but the functionalities are well isolated in a single file `com.acnlabs.CloudMapReduce.DbManager` that it should be fairly easy to port to other "databases". 
+
+The code in this file is broken down into several well isolated code blocks. The related functions are group close to each other in the source code. 
+
+== node synchronization == 
+
+Nodes can update their status (either "running" or "complete") for each phase (either "setup", "map", "reduce") to the data store. This information is used to synchronize all nodes. Currently, it is only used for synchronizing at the "setup" stage. A few nodes (by default 1) are responsible for creating the reduce queues beforehand, no other nodes should proceed until the setup is finished. The map and reduce stages synchronize using a commit mechanism discussed below.
+
+The following routines are used to update the status to the data store.
+
+{{{
+public void startTask()
+public void completeTask()
+private void updateStatus()
+}}}
+
+The following routines are used to read the collective states reported by all nodes and determine if a phase is finished. 
+
+{{{
+public boolean isPhaseComplete()
+public void waitForPhaseComplete()
+private int getPhaseSize()
+}}}
+
+== Reduce conflict resolution == 
+
+In rare occasions, two nodes may process the same reduce job at the same time. Eventually, they will realize there is a conflict and will attempt to resolve conflict through the data store. 
+
+They use the following routine to report a suspicion that there is a conflict. 
+
+{{{
+public void claimReduce()
+}}}
+
+Then, they use the following routine to query the list of potential parties involved in the conflict and resolve to a single owner of the reduce work. 
+
+{{{
+public String resolveReduce()
+}}}
+
+== Map and Reduce commit mechanism == 
+
+We use a commit mechanism to guard against failures and to ensure all parts of the job is completed. Whenever a node completes a map or reduce task successfully, it commits the result to the data store by calling the following:
+
+{{{
+public void commitTask()
+}}}
+
+Towards the end of a map or reduce stage, nodes start to query the data store for all completed work by checking the commit messages. They use the following functions and class.
+
+{{{
+private synchronized void insertCommittedTaskWinners()
+private class CollectCommittedTaskRunnable implements Runnable
+public HashSet<String> getCommittedTask()
+public Boolean isStageFinished()
+}}}
+
+The `Runnable` class is used to spawn several threads to query multiple SimpleDB domains in parallel. We use multiple domains to increase the overall write throughput. Beyond simply determining whether all map or reduce work has been completed, Cloud !MapReduce also uses `getCommittedTask` to get a list of valid results so that it can filter messages in the queues. 
+
+== Determine size of reduce queues ==
+
+We must keep track of how many messages are written to each reduce queue, so that we know how many to expect when we process it. After finishing a map task, the node updates to the data store the number of messages it generated for each reduce queue by calling the following. 
+
+{{{
+public void updateReduceOutputPerMap()
+}}}
+
+At the beginning of processing a reduce queue, the node queries the data store to see how many messages to expect. It sums up all values reported by all map nodes by calling the following functions and class. 
+
+{{{
+private synchronized void addReduceQSize()
+private class CollectReduceQSizeRunnable implements Runnable
+public int getReduceQSize()
+}}}
+
+Again, the `Runnable` is used to spawn multiple domains to increase the write throughput. 
+ 
+= Queue interface ==
+
