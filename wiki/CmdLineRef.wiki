@@ -15,6 +15,7 @@ The following options are mandatory. They have to be specified on the command li
 
  * -c clientid: Specifies the clientid of a node. A node must have a unique clientid to distinguish the node from other nodes in the system.
 
+ * -j jobid: Even though there is a default ("CloudMapReduce"), you almost always have to specify a unique jobid to avoid conflict. Make sure a jobid is unique, and one is not the prefix of another. A good practice is to name it something like "xxx000", then increment the number part for the next run.
 
 == Optional options ==
 
@@ -50,5 +51,3 @@ These options all have a default value. You only need to specify them if you wan
   * -vr x: Default=600. The visibility timeout for the reduce queues. The reduce queues hold the intermediate results. It affects the time taken for conflict resolution in the reduce phase.
 
   * -vm x: Default=7200. The visibility timeout for the master reduce queue, which holds the set of reduce partitions.
-
-  * -j string: Default="CloudMapReduce". If running jobs sequentially, it is necessary to increment the JobID in order to prevent queue collisions.
