@@ -1,3 +1,4 @@
+#labels Featured
 This page gives a high level view of the source code structure. It is designed to get a new contributor started quickly. However, keep in mind that, there is no substitute to reading the definitive guide -- the source code. 
 
 = Database interface =
@@ -127,11 +128,17 @@ The `setup()` function creates all reduce queues ahead of time when the job star
 
 The `mapreduce()` function is the main driver of the computation. It consists two stages: map and reduce. In map stage, it dequeues messages from the input queue, and for each message, it spawns a `MapRunnable` to process the map in a separate thread. It makes sure the `mapWorkers` thread pool has empty threads before dequeueing the next map task for processing. When the input queue reports that there are no more messages, it checks with the data store to make sure all map tasks are completed. If not, it goes back to the input queue asking for more work. The reduce stage works in a similar fashion. It checks the master reduce queue for work, spawns `ReduceRunnable` to process a reduce task in a separate thread, and checks the data store at the end to make sure all reduce tasks are completed. 
 
-`MapRunnable` simply implements the function to invoke a user-defined map function. The `ReduceRunnable` is a little more involved. 
+`MapRunnable` simply implements the function to invoke a user-defined map function. The `ReduceRunnable` is a little more involved. First, it queries the data store to determine how many messages are in the reduce queue by summing up the numbers reported by each map task. The total value is used to determine when it has finished processing all messages in the queue. Second, since each reduce queue may contain multiple reduce keys, `ReduceRunnable` keeps a state variable for each reduce key it has seen in `reduceStates` variable. Third, there may be a chance for two nodes to process the same reduce queue at the same time; therefore, `ReduceRunnable` also contains conflict resolution logic to recover from the conflict. 
 
 = Supporting classes =
 
 == Thread pool ==
+
+`com.acnlabs.CloudMapReduce.util.WorkerThreadQueue` is our implementation of a thread pool. This class is widely used throughout the code, from threads for map and reduce workers, to queue threads downloading/uploading message from/to SQS in the background. 
+
+It contains a buffer which holds `Runnable` objects. It launches a fixed number of threads (specified in the constructor) at the beginning, and these threads are woken up whenever there are new `Runnable` in the buffer. The threads pop `Runnable` from the buffer and start executing them until completion. Users of `WorkerThreadQueue` can `push()` in new `Runnable` for threads to process whenever one of them frees up. 
+
+`WorkerThreadQueue` supports a `waitForEmpty()` interface. Caller will go to sleep if all threads are busy, and it is woken up when a thread becomes idle. This interface is used in map and reduce task scheduling to make sure that we do not queue more map/reduce tasks than the threads are able to process. `WorkerThreadQueue` also supports a `waitForFinish()` interface, which is used by queue workers to wait for messages to be completely flushed out.
 
 == Performance tracker ==
 
