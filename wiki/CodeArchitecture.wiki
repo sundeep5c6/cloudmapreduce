@@ -6,7 +6,7 @@ Cloud !MapReduce uses a central "database" to store the job status. The intent i
 
 The code in this file is broken down into several well isolated code blocks. The related functions are group close to each other in the source code. 
 
-== node synchronization == 
+== Node synchronization == 
 
 Nodes can update their status (either "running" or "complete") for each phase (either "setup", "map", "reduce") to the data store. This information is used to synchronize all nodes. Currently, it is only used for synchronizing at the "setup" stage. A few nodes (by default 1) are responsible for creating the reduce queues beforehand, no other nodes should proceed until the setup is finished. The map and reduce stages synchronize using a commit mechanism discussed below.
 
@@ -79,7 +79,7 @@ public int getReduceQSize()
 
 Again, the `Runnable` is used to spawn multiple domains to increase the write throughput. 
  
-== Queue interface ==
+= Queue interface =
 
 Similar to the database interface, the queue interface is intended to be portable, so that we can run on a different infrastructure than Amazon in the future. Even though today the pure queue processing and the SQS interface parts are mixed in the same file, it is relatively easy to separate out the two functions in the future to support a different queue implementation, such as [http://activemq.apache.org/ ActiveMQ].
 
@@ -91,7 +91,7 @@ The other queue implementation is called `EfficientQueue`, which is built on top
 
 `QueueManager` also contains several useful functions for creating SQS queues, listing SQS queues so that it knows what additional queue needs to be created, and deleting SQS queues for clean up. 
 
-== File system interface == 
+= File system interface =
 
 Cloud !MapReduce uses S3 as the file system. Like the database and queue interface, the file system interface could be replaced in the future to support other file systems, such as that provided by [http://project-voldemort.com/ Project Voldemort]. 
 
@@ -111,8 +111,46 @@ There are several interfaces defined to ensure a consistent implementation. The 
 
 In addition, `OutputCollector` defines the standard interface for an application to output the key/value pairs. The `MapCollector`, `CombineCollector` and `ReduceCollector` (defined in `com.acnlabs.CloudMapReduce.mapreduce.MapReduce`) all implements the same interface.
 
+= !MapReduce =
+
+`com.acnlabs.CloudMapReduce.mapreduce.MapReduce` is the core and major driver of the MapReduce computation. 
+
+It first implements three collector classes: `MapCollector`, `CombineCollector` and `ReduceCollector`. 
+
+Each map task instantiates a separate `MapCollector`, which in turn instantiates its own `SimpleQueue` objects and its own thread pool for uploading messages to SQS. This is designed so that we can cleanly flush the output from a map task at the end before declaring the map task is successful and committing the result to the data store. When the `collect` function is called, `MapCollector` applies a hash function to the key to figure out which queue the message should be sent, then it invokes that queue's put interface to send the message. `MapCollector` also keeps track of how many messages are sent to each queue through the collector, and at the end of the map processing, it uploads the counts to the data store.
+
+If combiner is enabled, map outputs are first written to a `CombineCollector`, which are then written to a `MapCollector`. When the `collect` interface is called, `CombineCollector` invokes the user-defined reduce function. It keeps the states associated with all keys in the `combineStates` variable. If the total memory size used exceeds `maxCombineMemorySize` threshold, it invokes the `complete` interface of the user-defined reduce functions and write the results to the `MapCollector`. 
+
+The `ReduceCollector` is much simpler. When `collect` is called, it simply outputs the results to the output queue. 
+
+The `setup()` function creates all reduce queues ahead of time when the job starts. 
+
+The `mapreduce()` function is the main driver of the computation. It consists two stages: map and reduce. In map stage, it dequeues messages from the input queue, and for each message, it spawns a `MapRunnable` to process the map in a separate thread. It makes sure the `mapWorkers` thread pool has empty threads before dequeueing the next map task for processing. When the input queue reports that there are no more messages, it checks with the data store to make sure all map tasks are completed. If not, it goes back to the input queue asking for more work. The reduce stage works in a similar fashion. It checks the master reduce queue for work, spawns `ReduceRunnable` to process a reduce task in a separate thread, and checks the data store at the end to make sure all reduce tasks are completed. 
+
+`MapRunnable` simply implements the function to invoke a user-defined map function. The `ReduceRunnable` is a little more involved. 
+
 = Supporting classes =
 
 == Thread pool ==
 
 == Performance tracker ==
+
+`com.acnlabs.CloudMapReduce.performance.PerformanceTracker` is a home-grown solution for tracking performance statistics. It can track elapsed time statistics as follows (`perf` is a `PerformanceTracker` object):
+
+{{{
+long startTime = perf.getStartTime();
+// some code here, which we want to measure performance
+perf.stopTimer("StatName", startTime);
+}}}
+
+You first get the current timestamp into `startTime`, then you let the code you want to measure run. At the end, you invoke `perf.stopTime` which takes two arguments. First, you need to specify a name for the statistics, then you pass in the time recorded at the beginning. `perf` reports the total and average elapsed time for each statistics at the end.
+
+Alternatively, `perf` can track the total number of events as follows:
+
+{{{
+perf.incrementCounter("dataProcessed", data.length());
+}}}
+
+You specify a name for the statistics and an amount to increase. At the end, `perf` reports the total count. 
+
+Once you understand the use cases, it should become apparent what the source code is doing. 
