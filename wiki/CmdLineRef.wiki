@@ -15,7 +15,7 @@ The following options are mandatory. They have to be specified on the command li
 
  * -c clientid: Specifies the clientid of a node. A node must have a unique clientid to distinguish the node from other nodes in the system.
 
- * -j jobid: Even though there is a default ("CloudMapReduce"), you almost always have to specify a unique jobid to avoid conflict. Make sure a jobid is unique, and one is not the prefix of another. A good practice is to name it something like "xxx000", then increment the number part for the next run.
+ * -j jobid: Even though there is a default ("!CloudMapReduce"), you almost always have to specify a unique jobid to avoid conflict. Make sure a jobid is unique, and one is not the prefix of another. A good practice is to name it something like "xxx000", then increment the number part for the next run.
 
 == Optional options ==
 
