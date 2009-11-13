@@ -65,7 +65,7 @@ Each instance in your Cloud !MapReduce job needs to have a unique `clientid`. `B
 
  * -i /mybucket/test25.txt: This specifies the input file(s). If you list a directory, all files under the directory are processed. In this example, make sure test25.txt exists in bucket `mybucket`. 
 
- * -j job001: This specifies the job id. Each job must have a unique job id, to avoid stepping on each other's toe.
+ * -j job001: This specifies the job id. Each job must have a unique job id, to avoid stepping on each other's toe. If you see lots of duplicate messages or conflict resolutions, you probably reused a job id. MAKE SURE that the job id for each run is different and one is not the prefix of another. 
 
  * -p 20: Splits the input file(s) into 20 equal portions.
 
