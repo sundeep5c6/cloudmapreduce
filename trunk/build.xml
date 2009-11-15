@@ -24,9 +24,10 @@
   <property file="${user.home}/build.properties" />
   <property file="${basedir}/build.properties" />
 
-  <property name="src.dir" value="${basedir}/src"/>
+  <property name="src.dir" value="${basedir}/src/main/java"/>
+  <property name="resources.dir" value="${basedir}/src/main/resources"/>
   <property name="lib.dir" value="${basedir}/lib"/>
-  <property name="build.dir" value="${basedir}/build"/>
+  <property name="build.dir" value="${basedir}/ant-build"/>
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.lib" value="${build.dir}/classes"/>
   <property name="build.encoding" value="ISO-8859-1"/>
@@ -53,7 +54,7 @@
   <target name="compile" depends="clean">
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${build.classes}"/>
-  	<copy file="${src.dir}/log4j.properties" todir="${build.classes}"></copy>
+  	<copy file="${resources.dir}/log4j.properties" todir="${build.classes}"></copy>
     <javac 
       encoding="${build.encoding}"
       srcdir="${src.dir}"
