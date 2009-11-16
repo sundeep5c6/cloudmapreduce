@@ -6,19 +6,19 @@ Generic roadmap, for collaborative discussion.
 
 = Details =
 
-* Test cases/Continuous integration (possibly migrate to Maven?)
-* More sample MapReduce applications to show people how to use it
-* Support for cascaded MapReduce
-* Rethink the MapReduceApp class to make it easier for people to
+ * Test cases/Continuous integration (possibly migrate to Maven?)
+ * More sample MapReduce applications to show people how to use it
+ * Support for cascaded MapReduce
+ * Rethink the MapReduceApp class to make it easier for people to
 write applications
-* Performance optimization (code never gone through a profiler yet)
-* Cost optimization in DBManager. Look for ways to minimize database
+ * Performance optimization (code never gone through a profiler yet)
+ * Cost optimization in DBManager. Look for ways to minimize database
 queries to reduce SimpleDB cost.
-* Visual monitoring tool to watch job progress. (All statuses are in
+ * Visual monitoring tool to watch job progress. (All statuses are in
 SimpleDB, this tool just need to query SimpleDB to get a clear view)
-* Clearly separate out the cloud dependent stuff from non-cloud-
+ * Clearly separate out the cloud dependent stuff from non-cloud-
 dependent stuff, to make it easy to support other cloud platforms in
 the future
-* Support an internal cloud instantiation. Need to lock in a platform
+ * Support an internal cloud instantiation. Need to lock in a platform
 to be based on. Possible choices are ActiveMQ, Voldemort, CouchDB,
 Mnesia, MongoDB, Neo4J, Tokoyo Cabinet
