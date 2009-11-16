@@ -24,8 +24,8 @@
   <property file="${user.home}/build.properties" />
   <property file="${basedir}/build.properties" />
 
-  <property name="src.dir" value="${basedir}/src/main/java"/>
-  <property name="resources.dir" value="${basedir}/src/main/resources"/>
+  <property name="src.dir" value="${basedir}/cloudmapreduce-api/src/main/java"/>
+  <property name="resources.dir" value="${basedir}/cloudmapreduce-api/src/main/resources"/>
   <property name="lib.dir" value="${basedir}/lib"/>
   <property name="build.dir" value="${basedir}/ant-build"/>
   <property name="build.classes" value="${build.dir}/classes"/>
@@ -39,7 +39,7 @@
   <property name="javac.args" value=""/>
   <property name="javac.args.warnings" value="-Xlint:unchecked"/>
 
-  <property name="jar.file" value="${build.dir}/CloudMapReduce.jar"/>
+  <property name="jar.file" value="${build.dir}/cloudmapreduce-api.jar"/>
 	
   <!-- the normal classpath -->
   <path id="classpath">
