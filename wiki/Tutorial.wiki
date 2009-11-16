@@ -11,7 +11,7 @@ svn checkout http://cloudmapreduce.googlecode.com/svn/trunk/ cloudmapreduce
 
 `svn` is the subversion client program used for checking out source code. If you are on a Windows platform, you may need to use [http://www.cygwin.com Cygwin] to get the `svn` command. Or you can use a graphical interface, such as [http://tortoisesvn.tigris.org/ Tortoise]. 
 
-[Note: We're moving the build environment to Maven.  Fresh 'build' documentation coming soon.]
+(Note: We're moving the build environment to Maven.  Fresh 'build' documentation coming soon.)
 
 Once checked out, go into the main directory and compile the source code. 
 
