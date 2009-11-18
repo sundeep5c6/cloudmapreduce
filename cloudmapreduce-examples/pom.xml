@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.acnlabs</groupId>
         <artifactId>cloudmapreduce</artifactId>
-        <version>0.8-development</version>
+        <version>0.8-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -12,13 +12,14 @@
     <artifactId>cloudmapreduce-examples</artifactId>
     <packaging>jar</packaging>
     <name>CloudMapReduce Examples</name>
+    <version>0.8-SNAPSHOT</version>
     <url>http://code.google.com/p/cloudmapreduce/</url>
 
     <dependencies>
         <dependency>
         	<groupId>com.acnlabs</groupId>
         	<artifactId>cloudmapreduce-api</artifactId>
-        	<version>0.8-development</version>
+        	<version>0.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.amazonaws</groupId>

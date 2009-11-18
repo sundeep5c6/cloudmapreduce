@@ -5,10 +5,10 @@
     <groupId>com.acnlabs</groupId>
     <artifactId>cloudmapreduce</artifactId>
     <packaging>pom</packaging>
-    <version>0.8-development</version>
+    <version>0.8-SNAPSHOT</version>
     <name>CloudMapReduce Parent</name>
-    <url>http://maven.apache.org</url>
-    
+    <url>http://code.google.com/p/cloudmapreduce/</url>
+        
     <modules>
         <module>cloudmapreduce-api</module>
         <module>cloudmapreduce-examples</module>
