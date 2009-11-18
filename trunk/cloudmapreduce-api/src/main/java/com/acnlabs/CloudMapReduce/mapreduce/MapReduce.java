@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 
@@ -86,8 +88,16 @@ public class MapReduce {
     			queues.put(queueName, reduceQueue);
     		}
     		
-    		// TODO, use something other than + as separator???
-			reduceQueue.push(key + "+" + value);
+    		// SQS supports limited Unicode, see http://www.w3.org/TR/REC-xml/#charsets, has to encode both key and value to get around
+    		// encode conservatively using UTF-8, someone more familiar with encoding need to revisit
+    		// Encode separately so that the separator could take on characters not in UTF-8 but accepted by SQS
+    		try {
+    			reduceQueue.push(URLEncoder.encode(key, "UTF-8") + Global.separator + URLEncoder.encode(value, "UTF-8"));
+    		}
+    		catch (Exception ex) {
+        		logger.error("Message encoding failed. " + ex.getMessage());
+    		}
+
 		}
 		
 		public void close() {
@@ -169,12 +179,12 @@ public class MapReduce {
 			
 			// collect final key-value pair and put in output queue 
 			// enqueue to outSQS
-			if (key != null) {
-				outputQueue.push(key + " " + value);  // TODO, revisit separator
-			}
-			else {
-				outputQueue.push(value);
-			}
+    		try {
+    			outputQueue.push(URLEncoder.encode(key, "UTF-8") + Global.separator + URLEncoder.encode(value, "UTF-8"));
+    		}
+    		catch (Exception ex) {
+        		logger.error("Message encoding failed. " + ex.getMessage());
+    		}
 		}
 	}
 	
@@ -304,9 +314,9 @@ public class MapReduce {
 				for (Message msg : inputQueue) {
 					String value = msg.getBody();
 					// get the key for the key/value pair, in our case, key is the mapId
-					int separator = value.indexOf(':');   // first separator
+					int separator = value.indexOf(Global.separator);   // first separator
 					int mapId = Integer.parseInt(value.substring(0, separator));
-					value = value.substring(separator+1);
+					value = value.substring(separator+Global.separator.length());
 					logger.debug(mapId + ".");
 					
 			   		mapWorkers.push(new MapRunnable(map, combiner, Integer.toString(mapId), value, perf, mapId, msg.getReceiptHandle()));
@@ -440,10 +450,17 @@ public class MapReduce {
 					for (Message msg : value) {
 						String keyVal = msg.getBody();
 						count ++ ;
-						// TODO need a more robust separator mechanism, below is a temporary solution
-						int sep = keyVal.lastIndexOf('+');
+						int sep = keyVal.lastIndexOf(Global.separator);  // could choose indexOf too, should be unique in theory
 						String key = keyVal.substring(0, sep);
-						String val = keyVal.substring(sep + 1);
+						String val = keyVal.substring(sep + Global.separator.length());
+			    		// decode message as it was encoded when pushed to SQS
+			    		try {
+			    			key = URLDecoder.decode(key, "UTF-8");
+			    			val = URLDecoder.decode(val, "UTF-8");
+			    		}
+			    		catch (Exception ex) {
+			        		logger.error("Message decoding failed. " + ex.getMessage());
+			    		}
 						if (!reduceStates.containsKey(key)) {
 							long reduceStart = perf.getStartTime();
 							Object state = reduce.start(key, collector);

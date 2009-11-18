@@ -41,4 +41,8 @@ public class Global {
 	static public int mapQTimeout;  // timeout for pickup failed map tasks
 	static public int reduceQTimeout;  // timeout to resume after conflict resolution
 	static public int masterReduceQTimeout;  // timeout for pickup failed reduce tasks
+	
+	// Key-value pair separator, must be different from EfficientQueue's separator, and not substring of one another
+	// This separator must not be a normal string that could be confused with a key or value
+	static public final String separator = "!+!";
 }
