@@ -19,8 +19,6 @@ package com.acnlabs.CloudMapReduce;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -138,7 +136,7 @@ public class QueueManager implements Closeable {
      */
     synchronized public SimpleQueue getQueue(String name, boolean efficient, int maxNumMessages, QueueType type, HashSet<String> committedMap, String tag, WorkerThreadQueue workers) {
     	if (efficient) {
-    		return new EfficientQueue(new SimpleQueueImpl(name, maxNumMessages, type, committedMap, tag, workers), "!-!");
+    		return new EfficientQueue(new SimpleQueueImpl(name, maxNumMessages, type, committedMap, tag, workers));
     	}
     	else {
         	return new SimpleQueueImpl(name, maxNumMessages, type, committedMap, tag, workers);  // must be either input/output/masterReduce Queue
@@ -383,24 +381,16 @@ public class QueueManager implements Closeable {
     
     // Using the Adapter pattern, instead of inheritance, allows us to make any SimpleQueue to be efficient 
     private class EfficientQueue extends SimpleQueueAdapter {
-    	String delim;
+    	private final String delim = "!-!";   // deliminator between sub messages, make sure it is different from the key/value pair separator
     	StringBuilder body = new StringBuilder();
     	int pos = 0;
     	String[] list = new String[0];
     	
-    	public EfficientQueue(SimpleQueue queue, String delim) {
+    	public EfficientQueue(SimpleQueue queue) {
     		super(queue);
-    		this.delim = delim;
 		}
     	
     	public void push(String value) {
-    		// SQS does not support all characters, has to encode to get around
-    		try {
-    			value = URLEncoder.encode(value, "UTF-8");
-    		}
-    		catch (Exception ex) {
-        		logger.error("Message encoding failed. " + ex.getMessage());
-    		}
     		if (value.length() >= MAX_MESSAGE_BODY_SIZE) {
         		super.push(value);
     			return;
@@ -446,13 +436,6 @@ public class QueueManager implements Closeable {
     		Message msg = new Message();
     		getNext();
     		String next = list[pos];
-    		// decode message as it was encoded when pushed to SQS
-    		try {
-    			next = URLDecoder.decode(next, "UTF-8");
-    		}
-    		catch (Exception ex) {
-        		logger.error("Message decoding failed. " + ex.getMessage());
-    		}
     		pos++;
     		msg.setBody(next);
     		return msg;

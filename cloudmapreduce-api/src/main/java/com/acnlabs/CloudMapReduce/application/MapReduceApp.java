@@ -270,7 +270,7 @@ public abstract class MapReduceApp {
 				currentSize += len;
 				if (currentSize == splitSize) {
 					// prepend mapNum to uniquely identify each message, mapNum is the key, : is the separator
-					queue.push(mapNum + ":" + sb.toString());
+					queue.push(mapNum + Global.separator + sb.toString());
 					mapNum ++ ;
 					currentSize = 0;
 					sb = new StringBuilder();
@@ -279,7 +279,7 @@ public abstract class MapReduceApp {
 		}
 		if (sb.length() > 0) {
 			// prepend mapNum to uniquely identify each message
-			queue.push(mapNum + ":" + sb.toString());
+			queue.push(mapNum + Global.separator + sb.toString());
 			mapNum ++ ;
 		}
 	}
