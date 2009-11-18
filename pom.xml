@@ -5,7 +5,7 @@
     <groupId>com.acnlabs</groupId>
     <artifactId>cloudmapreduce</artifactId>
     <packaging>pom</packaging>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.7-release</version>
     <name>CloudMapReduce Parent</name>
     <url>http://maven.apache.org</url>
     
