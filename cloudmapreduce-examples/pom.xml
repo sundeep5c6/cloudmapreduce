@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.acnlabs</groupId>
         <artifactId>cloudmapreduce</artifactId>
-        <version>0.7-release</version>
+        <version>0.8-development</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,7 +18,7 @@
         <dependency>
         	<groupId>com.acnlabs</groupId>
         	<artifactId>cloudmapreduce-api</artifactId>
-        	<version>0.7-release</version>
+        	<version>0.8-development</version>
         </dependency>
         <dependency>
             <groupId>org.amazonaws</groupId>
