@@ -16,9 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.acnlabs</groupId>
-            <artifactId>cloudmapreduce-api</artifactId>
-            <version>0.1-SNAPSHOT</version>
+        	<groupId>com.acnlabs</groupId>
+        	<artifactId>cloudmapreduce-api</artifactId>
+        	<version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.amazonaws</groupId>
@@ -94,10 +94,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
     <build>
         <plugins>
             <plugin>
