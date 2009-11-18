@@ -3,7 +3,7 @@
 
 This tutorial covers how to run an existing sample application in Cloud !MapReduce. We cover the details on how to write an application for Cloud !MapReduce in [HowToWriteApp the how to write application tutorial]. 
 
-First, let us get a copy of the source code. The easiest way is to download a release, e.g., CloudMapReduce-0.7-release.zip. Unzip it to a directory, e.g., "/workspace/cloudmapreduce". 
+First, let us get a copy of the source code. The easiest way is to download a release, e.g., !CloudMapReduce-0.7-release.zip. Unzip it to a directory, e.g., "/workspace/cloudmapreduce". 
 
 Alternatively, you can check out from the source code repository, which always has the latest fixes compared to a released version. Run
 
@@ -22,7 +22,7 @@ mvn install
 
 Maven (`mvn`) is a build compilation system. You can get it from [http://maven.apache.org/download.html Maven download], or you can use Eclipse's export feature to compile it.
 
-You should now have a cloudmapreduce-api-*.jar in cloudmapreduce-api/target directory and a cloudmapreduce-examples-*.jar in cloudmapreduce-examples/target directory (they are in the root directory in a release zip file). These are the executable files we will run. You can run it anywhere. In fact, you can run it in the SETI@HOME style, where you harvest idle computing cycles. A node can join the computation any time, and it can automatically figure out the overall job status and join the computation, but that is a more advanced topic. You can also run it from EC2 manually, but we will describe an easier way -- using a pre-built AMI -- to run it in EC2 in the following. 
+You should now have a cloudmapreduce-api-....jar in cloudmapreduce-api/target directory and a cloudmapreduce-examples-....jar in cloudmapreduce-examples/target directory (they are in the root directory in a release zip file). These are the executable files we will run. You can run it anywhere. In fact, you can run it in the SETI@HOME style, where you harvest idle computing cycles. A node can join the computation any time, and it can automatically figure out the overall job status and join the computation, but that is a more advanced topic. You can also run it from EC2 manually, but we will describe an easier way -- using a pre-built AMI -- to run it in EC2 in the following. 
 
 Let us first upload the executable files to a bucket in S3. There are a variety of tools to use, I use [https://addons.mozilla.org/en-US/firefox/addon/3247 S3fox], which is a plugin for the firefox browser. Assume we put them under S3 bucket `mybucket`.
 
