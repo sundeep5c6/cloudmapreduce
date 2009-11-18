@@ -15,7 +15,7 @@
 *
 * @author Huan Liu (huanliu AT cs.stanford.edu)
 */ 
-package com.acnlabs.CloudMapReduce.application;
+package com.acnlabs.CloudMapReduce.examples;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import com.acnlabs.CloudMapReduce.Global;
 import com.acnlabs.CloudMapReduce.S3FileSystem;
 import com.acnlabs.CloudMapReduce.SimpleQueue;
+import com.acnlabs.CloudMapReduce.application.MapReduceApp;
 import com.acnlabs.CloudMapReduce.mapreduce.MapReduce;
 import com.acnlabs.CloudMapReduce.mapreduce.Mapper;
 import com.acnlabs.CloudMapReduce.mapreduce.OutputCollector;
