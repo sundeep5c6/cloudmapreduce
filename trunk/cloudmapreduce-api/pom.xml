@@ -4,14 +4,14 @@
     <parent>
         <groupId>com.acnlabs</groupId>
         <artifactId>cloudmapreduce</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.7-release</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.acnlabs</groupId>
     <artifactId>cloudmapreduce-api</artifactId>
     <packaging>jar</packaging>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.7-release</version>
     <name>CloudMapReduce API</name>
     
     <dependencies>
