@@ -143,9 +143,9 @@ public class CloudMapReduceIntTest extends MapReduceApp {
    */
    @Test
   public void test() throws Exception {
-	  // -k 074JBVRQT02FKTH415R2 -s HV77BfyMGymmdxtXjjzoviyMhyUwrh4irUE0kALi -c 0 -i /kplummer/word_10MB.txt -j kit002
-      String args[] = {"-k", "074JBVRQT02FKTH415R2", 
-    		  			"-s", "HV77BfyMGymmdxtXjjzoviyMhyUwrh4irUE0kALi", 
+	  // -k <AWS KEY ID> -s <AWS KEY> -c 0 -i /kplummer/word_10MB.txt -j kit002
+      String args[] = {"-k", "", 
+    		  			"-s", "", 
     		  			"-c", "0",
     		  			"-i", "/kplummer/word_10MB.txt",
     		  			"-j", "test001"};
