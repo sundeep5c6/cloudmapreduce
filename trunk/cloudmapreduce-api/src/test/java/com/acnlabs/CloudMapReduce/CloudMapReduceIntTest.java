@@ -19,18 +19,19 @@ package com.acnlabs.CloudMapReduce;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
-
-import com.acnlabs.CloudMapReduce.Global;
-import com.acnlabs.CloudMapReduce.S3FileSystem;
-import com.acnlabs.CloudMapReduce.SimpleQueue;
-import com.acnlabs.CloudMapReduce.application.MapReduceApp;
-import com.acnlabs.CloudMapReduce.mapreduce.*;
-import com.acnlabs.CloudMapReduce.performance.PerformanceTracker;
-
 import org.junit.Test;
+
+import com.acnlabs.CloudMapReduce.application.MapReduceApp;
+import com.acnlabs.CloudMapReduce.mapreduce.MapReduce;
+import com.acnlabs.CloudMapReduce.mapreduce.Mapper;
+import com.acnlabs.CloudMapReduce.mapreduce.OutputCollector;
+import com.acnlabs.CloudMapReduce.mapreduce.Reducer;
+import com.acnlabs.CloudMapReduce.performance.PerformanceTracker;
 
 
 /**
@@ -143,12 +144,17 @@ public class CloudMapReduceIntTest extends MapReduceApp {
    */
    @Test
   public void test() throws Exception {
+	   Properties defaultProps = new Properties();
+	   InputStream is = this.getClass().getResourceAsStream("/cloudmapreduce.properties");
+	   defaultProps.load(is);
+	   is.close();
+	   System.out.println("inputQueue: " + defaultProps.getProperty("inputQueue"));
 	  // -k <AWS KEY ID> -s <AWS KEY> -c 0 -i /kplummer/word_10MB.txt -j kit002
-      String args[] = {"-k", "", 
-    		  			"-s", "", 
-    		  			"-c", "0",
-    		  			"-i", "/kplummer/word_10MB.txt",
-    		  			"-j", "test001"};
+      String args[] = {"-k", System.getenv("AMAZON_ACCESS_KEY_ID"), 
+    		  			"-s", System.getenv("AMAZON_SECRET_ACCESS_KEY"), 
+    		  			"-c", defaultProps.getProperty("clientId"),
+    		  			"-i", defaultProps.getProperty("inputQueue"),
+    		  			"-j", defaultProps.getProperty("jobId")};
 	  new CloudMapReduceIntTest().runMain(args);
 	  System.exit(0);
   }
