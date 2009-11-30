@@ -7,7 +7,7 @@ Generic roadmap, for collaborative discussion.
 = Details =
 
  * Test cases/Continuous integration (possibly migrate to Maven?)
-  * Have started with the Maven skeleton, will work on a e2e integration test first.
+  * Status: Done with Maven integration. Working on a e2e integration test.
  * More sample MapReduce applications to show people how to use it. As an idea, [http://mapreduce.stanford.edu Phoenix] implemented a few more, including
     * MatrixMultiply
     * KMeans
@@ -24,3 +24,4 @@ Generic roadmap, for collaborative discussion.
  * Clearly separate out the cloud dependent stuff from non-cloud-dependent stuff, to make it easy to support other cloud platforms in the future.
  * Support an internal cloud instantiation. Need to lock in a platform to be based on. Possible choices are ActiveMQ, Voldemort, CouchDB, Mnesia, MongoDB, Neo4J, Tokoyo Cabinet
  * Tools to export data in a user-friendlier form. All outputs are currently in SQS, need to put them in a file?
+ * Support more data types other than strings for key/value pairs.
