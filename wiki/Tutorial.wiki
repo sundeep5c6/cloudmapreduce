@@ -41,7 +41,7 @@ or to test then install
 
 {{{
 mvn install
-]]]
+}}}
 
 You should now have a cloudmapreduce-api-....jar in cloudmapreduce-api/target directory and a cloudmapreduce-examples-....jar in cloudmapreduce-examples/target directory (they are in the root directory in a release zip file). These are the executable files we will run. You can run it anywhere. In fact, you can run it in the SETI@HOME style, where you harvest idle computing cycles. A node can join the computation any time, and it can automatically figure out the overall job status and join the computation, but that is a more advanced topic. You can also run it from EC2 manually, but we will describe an easier way -- using a pre-built AMI -- to run it in EC2 in the following. 
 
