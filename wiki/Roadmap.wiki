@@ -8,6 +8,7 @@ Generic roadmap, for collaborative discussion.
 
  * Test cases/Continuous integration (possibly migrate to Maven?)
   * Status: Done with Maven integration. Working on a e2e integration test.
+ * Junit test framework. Need a framework and test coding standard to support Junit tests for all modules in the future.
  * More sample MapReduce applications to show people how to use it. As an idea, [http://mapreduce.stanford.edu Phoenix] implemented a few more, including
     * MatrixMultiply
     * KMeans
