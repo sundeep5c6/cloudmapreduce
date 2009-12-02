@@ -43,7 +43,9 @@ or to test then install
 mvn install
 }}}
 
-You should now have a cloudmapreduce-api-....jar in cloudmapreduce-api/target directory and a cloudmapreduce-examples-....jar in cloudmapreduce-examples/target directory (they are in the root directory in a release zip file). These are the executable files we will run. You can run it anywhere. In fact, you can run it in the SETI@HOME style, where you harvest idle computing cycles. A node can join the computation any time, and it can automatically figure out the overall job status and join the computation, but that is a more advanced topic. You can also run it from EC2 manually, but we will describe an easier way -- using a pre-built AMI -- to run it in EC2 in the following. 
+You should now have a cloudmapreduce-api-....jar in cloudmapreduce-api/target directory and a cloudmapreduce-examples-....jar in cloudmapreduce-examples/target directory (they are in the root directory in a release zip file). These are the executable files we will run. You can run it anywhere. In fact, you can run it in the SETI@HOME style, where you harvest idle computing cycles. A node can join the computation any time, and it can automatically figure out the overall job status and join the computation, but that is a more advanced topic. You can also run it from EC2 manually, but we will describe an easier way -- using a pre-built AMI -- to run it in EC2 in the following first. 
+
+= Run Cloud !MapReduce job using the pre-built AMI =
 
 Let us first upload the executable files to a bucket in S3. There are a variety of tools to use, I use [https://addons.mozilla.org/en-US/firefox/addon/3247 S3fox], which is a plugin for the firefox browser. Assume we put them under S3 bucket `mybucket`.
 
@@ -106,4 +108,21 @@ The AMI automatically updates machine statistics, including CPU, network, disk, 
 
 http://s3.amazonaws.com/huanliu/GAEmonitoring.JPG
 
+= Run Cloud !MapReduce job using command line =
+
+Alternatively, you can run Cloud !MapReduce jobs locally on your own machine. This is used more often when you debug and test your changes. You can use the shell script `bin\run` in the source code, and provide the command line argument, i.e., 
+
+{{{
+bin/run com.acnlabs.CloudMapReduce.application.WordCount -k AAAAAA -s sssssss -i /cloudos/test25.txt -j job001 -p 20 -r 20 -cb -c 0
+}}}
+
+`bin/run` is nothing but a Java command specifying all locations of the libraries:
+
+{{{
+java -Xmx1500m -classpath .:cloudmapreduce-api-0.8-development.jar:cloudmapreduce-examples-0.8-development.jar:lib/amazon-queue-2008-01-01-java-library.jar:lib/jakarta-commons/commons-httpclient-3.0.1.jar:lib/jakarta-commons/commons-codec-1.3.jar:lib/jakarta-commons/commons-logging-1.1.jar:lib/log4j/log4j-1.2.14.jar:lib/amazon-simple-db-2009-04-15-java-library.jar:lib/args4j-2.0.12.jar:lib/s3.jar $@
+}}}
+
+If you have problems running the command, most likely it is because you are missing some dependent Jar files. Specify them on the command line will fix the problem. 
+
+Within Eclipse, you can specify the command line arguments in the launch configuration. You do not need to specify the dependent library as it is automatically taken care of by Eclipse
 Congratulations on your first Cloud !MapReduce job. 
