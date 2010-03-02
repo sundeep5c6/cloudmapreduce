@@ -158,8 +158,8 @@ public class SimpleDBTest extends MapReduceApp {
 	         * Access Key ID and Secret Acess Key ID, obtained from:
 	         * http://aws.amazon.com
 	         ***********************************************************************/
-	        String accessKeyId = "119ACF5RYDD83Q130J82";
-	        String secretAccessKey = "VhoxkgiqqAaaCHU3GIdRyweL/IOWnIl4IyECKYwU";
+	        String accessKeyId = "";
+	        String secretAccessKey = "";
 
 	        /************************************************************************
 	         * Instantiate Http Client Implementation of Amazon Simple DB 
