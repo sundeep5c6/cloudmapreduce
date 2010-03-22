@@ -31,15 +31,17 @@ import com.acnlabs.CloudMapReduce.util.WorkerThreadQueue;
 import com.amazonaws.queue.AmazonSQS;
 import com.amazonaws.queue.AmazonSQSClient;
 import com.amazonaws.queue.AmazonSQSException;
-import com.amazonaws.queue.model.CreateQueue;
-import com.amazonaws.queue.model.DeleteMessage;
-import com.amazonaws.queue.model.DeleteQueue;
-import com.amazonaws.queue.model.ListQueues;
+import com.amazonaws.queue.model.CreateQueueRequest;
+import com.amazonaws.queue.model.CreateQueueResponse;
+import com.amazonaws.queue.model.CreateQueueResult;
+import com.amazonaws.queue.model.DeleteMessageRequest;
+import com.amazonaws.queue.model.DeleteQueueRequest;
+import com.amazonaws.queue.model.ListQueuesRequest;
 import com.amazonaws.queue.model.ListQueuesResponse;
 import com.amazonaws.queue.model.Message;
-import com.amazonaws.queue.model.ReceiveMessage;
+import com.amazonaws.queue.model.ReceiveMessageRequest;
 import com.amazonaws.queue.model.ReceiveMessageResponse;
-import com.amazonaws.queue.model.SendMessage;
+import com.amazonaws.queue.model.SendMessageRequest;
 
 /*
  * Manages SQS queues
@@ -60,6 +62,7 @@ public class QueueManager implements Closeable {
 	public PerformanceTracker perf = new PerformanceTracker();
 	static final int MAX_MESSAGE_BODY_SIZE = 7*1024;
 	private Logger  logger = Logger.getLogger("com.acnlabs.CloudMapReduce.QueueManager");
+	private String urlPrefix = null;
 	    
     public enum QueueType {MAP, REDUCE, MASTERREDUCE, OUTPUT }
     
@@ -94,7 +97,7 @@ public class QueueManager implements Closeable {
      */
     private List<String> listQueues(String prefix) {
     	try {
-    		ListQueuesResponse response = service[0].listQueues(new ListQueues().withQueueNamePrefix(prefix));
+    		ListQueuesResponse response = service[0].listQueues(new ListQueuesRequest().withQueueNamePrefix(prefix));
     		return response.getListQueuesResult().getQueueUrl();
     	}
     	catch (AmazonSQSException ex) {
@@ -108,7 +111,7 @@ public class QueueManager implements Closeable {
     	try {
        		// Check queue
     		long listQueueStat = perf.getStartTime();
-       		ListQueuesResponse response = service[0].listQueues(new ListQueues().withQueueNamePrefix(prefix));
+       		ListQueuesResponse response = service[0].listQueues(new ListQueuesRequest().withQueueNamePrefix(prefix));
     		perf.stopTimer("listQueueStat", listQueueStat);
        		for (String url : response.getListQueuesResult().getQueueUrl()) {
        			int nameStart = url.lastIndexOf('/');
@@ -153,7 +156,7 @@ public class QueueManager implements Closeable {
     	try {
     		// Delete queue
     		long deleteQueueStat = perf.getStartTime();
-    		service[0].deleteQueue(new DeleteQueue().withQueueName(name));
+    		service[0].deleteQueue(new DeleteQueueRequest().withQueueUrl(urlPrefix + name));
     		perf.stopTimer("deleteQueueStat", deleteQueueStat);
     	}
     	catch (AmazonSQSException ex) {
@@ -276,7 +279,7 @@ public class QueueManager implements Closeable {
 		        		long getMessageQueueStat = perf.getStartTime();
 		    			// receive the messages and store them in a class variable
 		    			for (int f = 0; f < NUM_END_QUEUE_RETRIES && messages.size() == 0; f++) {
-	 		    			ReceiveMessage request = new ReceiveMessage().withQueueName(name);
+	 		    			ReceiveMessageRequest request = new ReceiveMessageRequest().withQueueUrl(urlPrefix + name);
 			    			ReceiveMessageResponse response = localservice.receiveMessage(request.withMaxNumberOfMessages(maxNumMessages));
 			    			insertMessages(response.getReceiveMessageResult().getMessage());
 		    			}
@@ -351,7 +354,18 @@ public class QueueManager implements Closeable {
     		long createQueueStat = perf.getStartTime();
         	try {
         		// Create queue
-        		localservice.createQueue(new CreateQueue().withQueueName(name).withDefaultVisibilityTimeout(visibilityTimeout));
+        		CreateQueueResponse response = localservice.createQueue(new CreateQueueRequest().withQueueName(name).withDefaultVisibilityTimeout(visibilityTimeout));
+        		// harvest the URL prefix if we have not
+        		if ( urlPrefix == null ) {
+                    if (response.isSetCreateQueueResult()) {
+                        CreateQueueResult  createQueueResult = response.getCreateQueueResult();
+                        if (createQueueResult.isSetQueueUrl()) {
+                        	String url = createQueueResult.getQueueUrl();
+                        	urlPrefix = url.substring(0, url.lastIndexOf('/')+1);
+                        }
+                    } 
+
+        		}
         		perf.stopTimer("createQueueStat", createQueueStat);
         	}
         	catch (AmazonSQSException ex) {
@@ -459,7 +473,7 @@ public class QueueManager implements Closeable {
         	try {
     			// Delete message from queue
 	        	long startTime = perf.getStartTime();
-    			DeleteMessage request = new DeleteMessage().withQueueName(queueName);
+    			DeleteMessageRequest request = new DeleteMessageRequest().withQueueUrl(urlPrefix + queueName);
     			service[0].deleteMessage(request.withReceiptHandle(receiptHandle));
         		perf.stopTimer("deleteMessageQueueStat", startTime);
     			//deleteMessages.remove(0);
@@ -490,7 +504,7 @@ public class QueueManager implements Closeable {
 		    	try {
 		        	long startTime = perf.getStartTime();
 		    		// push value to queue
-		    		localservice.sendMessage(new SendMessage().withQueueName(queueName).withMessageBody(body));
+		    		localservice.sendMessage(new SendMessageRequest().withQueueUrl(urlPrefix + queueName).withMessageBody(body));
 		        	perf.stopTimer("pushQueueStat", startTime);
 		        }
 		        catch (AmazonSQSException ex) {
@@ -521,7 +535,7 @@ public class QueueManager implements Closeable {
         		long getMessageQueueStat = perf.getStartTime();
     			// receive the messages and store them in a class variable
     			for (int f = 0; f < NUM_END_QUEUE_RETRIES && (messages == null || messages.size()==0); f++) {
-        			ReceiveMessage request = new ReceiveMessage().withQueueName(queue.getName());
+        			ReceiveMessageRequest request = new ReceiveMessageRequest().withQueueUrl(urlPrefix + queue.getName());
         			ReceiveMessageResponse response = localservice.receiveMessage(request.withMaxNumberOfMessages(10));  // make sure maxNumMessages=10
         			messages = response.getReceiveMessageResult().getMessage();
     			}
