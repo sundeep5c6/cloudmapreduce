@@ -25,15 +25,15 @@
             <groupId>org.amazonaws</groupId>
             <artifactId>queue</artifactId>
             <scope>system</scope>
-            <version>2008-01-01</version>
-            <systemPath>${basedir}/../lib/amazon-queue-2008-01-01-java-library.jar</systemPath>
+            <version>2009-02-01</version>
+            <systemPath>${basedir}/../lib/amazon-sqs-2009-02-01-java-library.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.amazonaws</groupId>
             <artifactId>simple-db</artifactId>
             <scope>system</scope>
             <version>2009-04-15</version>
-            <systemPath>${basedir}/../lib/amazon-simple-db-2009-04-15-java-library.jar</systemPath>
+            <systemPath>${basedir}/../lib/amazon-simpledb-2009-04-15-java-library.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.amazonaws</groupId>
